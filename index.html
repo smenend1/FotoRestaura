@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d4af37">
+  <title>Cinematic PWA Studio</title>
+  <link rel="stylesheet" href="/src/styles.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <main class="app-container">
+    <header class="app-header">
+      <div class="header-title">
+        <h1>Cinematic FX Studio</h1>
+        <p class="subtitle">Estilo de video musical cálido y dorado</p>
+      </div>
+      <span id="connection-status" class="status-badge online">Online</span>
+    </header>
+
+    <section class="workspace">
+      <div class="control-panel">
+        <div class="panel-section">
+          <span class="step-number">1</span>
+          <h2>Selecciona tu foto</h2>
+          <label for="image-input" class="action-btn upload-btn">📁 Subir Imagen</label>
+          <input type="file" id="image-input" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="panel-section">
+          <span class="step-number">2</span>
+          <h2>Procesamiento</h2>
+          <button id="process-btn" class="action-btn process-btn" disabled>✨ Aplicar Estilo Cinemático</button>
+        </div>
+
+        <div class="panel-section">
+          <span class="step-number">3</span>
+          <h2>Guardar Resultado</h2>
+          <button id="download-btn" class="action-btn download-btn" disabled>📥 Descargar Foto</button>
+        </div>
+
+        <div class="prompt-info">
+          <h3>Efectos aplicados activamente:</h3>
+          <ul>
+            <li>Fondo con desenfoque suave (Shallow Depth of Field).</li>
+            <li>Iluminación trasera dorada (Golden Rim Light).</li>
+            <li>Paleta cromática cálida (Amber/Gold Moody Tones).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <div id="empty-state" class="empty-state">
+          <p>Ninguna imagen cargada. Sube una foto para ver la vista previa aquí.</p>
+        </div>
+        <canvas id="main-canvas" class="hidden"></canvas>
+        
+        <div id="loading-overlay" class="overlay hidden">
+          <div class="spinner"></div>
+          <p>Renderizando iluminación dorada y enfoque...</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
