@@ -1,10 +1,8 @@
-const ctx: Worker = self as any;
-
-ctx.addEventListener('message', async (event: MessageEvent) => {
+self.addEventListener('message', async (event) => {
   const { imageBitmap } = event.data;
   
   if (!imageBitmap) {
-    ctx.postMessage({ error: 'No se recibieron datos de imagen' });
+    self.postMessage({ error: 'No se recibieron datos de imagen' });
     return;
   }
 
@@ -15,7 +13,7 @@ ctx.addEventListener('message', async (event: MessageEvent) => {
   const context = canvas.getContext('2d');
 
   if (!context) {
-    ctx.postMessage({ error: 'No se pudo inicializar el contexto Offscreen' });
+    self.postMessage({ error: 'No se pudo inicializar el contexto Offscreen' });
     return;
   }
 
@@ -27,21 +25,15 @@ ctx.addEventListener('message', async (event: MessageEvent) => {
   const centerY = height / 2;
   const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
 
+  // Filtro de calidez cinematográfica
   for (let i = 0; i < data.length; i += 4) {
-    let r = data[i];
-    let g = data[i + 1];
-    let b = data[i + 2];
-
-    r = Math.min(255, r * 1.18);
-    g = Math.min(255, g * 1.08);
-    b = b * 0.82;
-
-    data[i] = r;
-    data[i + 1] = g;
-    data[i + 2] = b;
+    data[i] = Math.min(255, data[i] * 1.18);      // R
+    data[i + 1] = Math.min(255, data[i + 1] * 1.08);  // G
+    data[i + 2] = data[i + 2] * 0.82;                 // B
   }
   context.putImageData(imageData, 0, 0);
 
+  // Aplicación del desenfoque perimetral para aislar al sujeto
   const blurredCanvas = new OffscreenCanvas(width, height);
   const blurredCtx = blurredCanvas.getContext('2d');
   if (blurredCtx) {
@@ -51,6 +43,7 @@ ctx.addEventListener('message', async (event: MessageEvent) => {
     context.filter = 'none';
   }
 
+  // Creación de máscara radial para preservar el rostro nítido y añadir frontal light
   const maskCanvas = new OffscreenCanvas(width, height);
   const maskCtx = maskCanvas.getContext('2d');
   if (maskCtx) {
@@ -60,7 +53,7 @@ ctx.addEventListener('message', async (event: MessageEvent) => {
     maskCtx.fillStyle = gradient;
     maskCtx.fillRect(0, 0, width, height);
 
-    blurredCanvas.getContext('2d')?.drawImage(imageBitmap, 0, 0);
+    blurredCanvas.getContext('2d').drawImage(imageBitmap, 0, 0);
     context.globalCompositeOperation = 'destination-out';
     context.drawImage(maskCanvas, 0, 0);
     context.globalCompositeOperation = 'destination-over';
@@ -68,14 +61,15 @@ ctx.addEventListener('message', async (event: MessageEvent) => {
     context.globalCompositeOperation = 'source-over';
   }
 
+  // Añadir el resplandor dorado trasero (Rim Light)
   const glowGradient = context.createRadialGradient(centerX, centerY, Math.min(width, height) * 0.3, centerX, centerY, maxDistance);
   glowGradient.addColorStop(0, 'rgba(229, 169, 59, 0.0)');
-  glowGradient.addColorStop(0.7, 'rgba(229, 169, 59, 0.25)');
+  glowGradient.addColorStop(0.7, 'rgba(229, 169, 59, 0.22)');
   glowGradient.addColorStop(1, 'rgba(229, 169, 59, 0.0)');
   
   context.fillStyle = glowGradient;
   context.fillRect(0, 0, width, height);
 
   const processedBitmap = canvas.transferToImageBitmap();
-  ctx.postMessage({ processedBitmap }, [processedBitmap]);
+  self.postMessage({ processedBitmap }, [processedBitmap]);
 });
