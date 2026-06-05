@@ -1,12 +1,12 @@
 const CACHE_NAME = 'cinema-processor-v1';
 const ASSETS = [
-  '/index.html',
-  '/src/main.ts',
-  '/src/styles.css',
-  '/src/modules/pwa-manager.ts',
-  '/src/modules/ui-controller.ts',
-  '/src/workers/image-processor.worker.ts',
-  '/manifest.json'
+  'index.html',
+  'src/main.ts',
+  'src/styles.css',
+  'src/modules/pwa-manager.ts',
+  'src/modules/ui-controller.ts',
+  'src/workers/image-processor.worker.ts',
+  'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -38,8 +38,8 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).catch(() => {
-        if (event.request.headers.get('accept').includes('text/html')) {
-          return caches.match('/index.html');
+        if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
+          return caches.match('index.html');
         }
       });
     })
